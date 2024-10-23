@@ -1,0 +1,53 @@
+class Manacher {
+    vector<int> palinLen;
+
+    void run_manacher(string &str) {
+        // cout << str << endl;
+        int n = str.size();
+        palinLen.assign(n, 1);
+        int l = 0;  
+        int r = 0;  
+
+        for (int i = 1; i < n; i++) {
+            if (i < r) {
+                palinLen[i] = min(r - i, palinLen[l + r - i]);
+            }
+
+            while (i + palinLen[i] < n && i - palinLen[i] >= 0 && str[i + palinLen[i]] == str[i - palinLen[i]]) {
+                palinLen[i]++;
+            }
+
+            if (i + palinLen[i] > r) {
+                l = i - palinLen[i];
+                r = i + palinLen[i];
+            }
+        }
+    }
+
+public:
+    void build(string &origStr) {
+        string str;
+        str.push_back('#');
+        for (auto ch : origStr) {
+            str.push_back(ch);
+            str.push_back('#');
+        }
+        run_manacher(str);
+    }
+
+    int getLongestPalin(int cen, bool odd) {
+        int pos = 2 * cen + 1 + !(odd);
+        return palinLen[pos] - 1; 
+    }
+
+    int getLongestPalin(int cen) {
+        return max(getLongestPalin(cen, true), getLongestPalin(cen, false));
+    }
+
+    bool checkPalin(int l, int r) {
+        if ((r - l + 1) <= getLongestPalin((l + r) / 2, l % 2 == r % 2)) {
+            return true;
+        }
+        return false;
+    }
+};
